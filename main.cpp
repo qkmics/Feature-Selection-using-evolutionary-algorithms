@@ -128,7 +128,7 @@ private:
         }
 
     }
-    bool fitnessGet(int targetFitness)
+    bool fitnessBigerThan(int targetFitness)
     {
         if(this->individuals[0].clacuFitness()>=targetFitness)
             return true;
@@ -148,16 +148,6 @@ private:
             indiv.print();
         cout<<endl;
     }
-public:
-    Population(int populationSize,int length)  //种群大小，个体的基因长度
-    {
-        for(int i=0;i<populationSize;i++)
-        {
-            Individual individual(length);
-            this->individuals.push_back(individual);
-        }
-    }
-
     void selectCrossover(int num)   //选择num数量的个体，交配
     {
         mutation();  //变异
@@ -167,12 +157,21 @@ public:
         sort();  //按适应度从大到小排序
         //print();
     }
-
-    Individual process(int targetFitness,int num,int maxGeneration)
+    
+public:
+    Population(int populationSize,int length)  //种群大小，个体的基因长度
+    {
+        for(int i=0;i<populationSize;i++)
+        {
+            Individual individual(length);
+            this->individuals.push_back(individual);
+        }
+    }
+    Individual evolution(int targetFitness,int num,int maxGeneration)
     {
         int generation=0;
         selectCrossover(num);
-        while(fitnessGet(targetFitness)==false&&maxGeneration--)
+        while(fitnessBigerThan(targetFitness)==false&&maxGeneration--)
         {
             if(generation%10==0)
             {
@@ -198,6 +197,6 @@ int main()
     maxGeneration=1000;
 
     Population population(populationSize,geneLength);
-    Individual targetIndiv=population.process(targetFitness,selectNum,maxGeneration);
+    Individual targetIndiv=population.evolution(targetFitness,selectNum,maxGeneration);
     return 0;
 }
