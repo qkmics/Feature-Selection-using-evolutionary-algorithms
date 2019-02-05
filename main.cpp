@@ -5,7 +5,7 @@
 
 using namespace std;
 
-class Individual  //个体
+class Individual
 {
 private:
     vector<bool> genes;
@@ -15,10 +15,10 @@ public:
     {
 
     }
-    Individual(int length)
+    Individual(int geneLength)
     {
         srand((unsigned)rand()+(unsigned)(time(0)));      //注意此处的随机数产生方式
-        for(int i=0;i<length;i++)
+        for(int i=0;i<geneLength;i++)
             genes.push_back((rand() % 2));
     }
     void setGenes(vector<bool> genes)
@@ -29,6 +29,7 @@ public:
     {
         return this->genes;
     }
+
     int clacuFitness(void)
     {
         int fitness=0;
@@ -47,9 +48,15 @@ public:
     void mutation(void)
     {
         srand((unsigned)rand()+(unsigned)(time(0)));
-        int point=rand()%genes.size();
-        //cout<<"mutation point: "<<point<<endl;
-        genes[point]=1-genes[point];
+        int num=1000;
+        int randNum1=rand()%num;
+        double p=0.6;                       //注意此处的变异概率
+        if(randNum1<p*num)
+        {
+            int point=rand()%genes.size();
+            //cout<<"mutation point: "<<point<<endl;
+            genes[point]=1-genes[point];
+        }
     }
 
     void print(void)
@@ -115,7 +122,7 @@ private:
         individuals.erase(individuals.begin()+num-1,individuals.end());
     }
 
-    void crossover() //交配
+    void crossover(void) //交配
     {
         //cout<<"crossover"<<endl;
         int parentNum=individuals.size()-2;
@@ -154,39 +161,42 @@ private:
         sort();  //按适应度从大到小排序
         select(num);  //选择
         crossover();  //交配
-        sort();  //按适应度从大到小排序
+        //sort();  //按适应度从大到小排序
         //print();
     }
-    
 public:
-    Population(int populationSize,int length)  //种群大小，个体的基因长度
+    Population(int populationSize,int geneLength)  //种群大小，个体的基因长度
     {
         for(int i=0;i<populationSize;i++)
         {
-            Individual individual(length);
+            Individual individual(geneLength);
             this->individuals.push_back(individual);
         }
     }
+
     Individual evolution(int targetFitness,int num,int maxGeneration)
     {
         int generation=0;
         selectCrossover(num);
         while(fitnessBigerThan(targetFitness)==false&&maxGeneration--)
         {
-            if(generation%10==0)
+            if(generation%100==0)
             {
                 cout<<"generation:"<<generation<<endl;
                 cout<<"Greatest fitness:"<<individuals[0].clacuFitness()<<endl;
                 individuals[0].print();
             }
-
             generation++;
             selectCrossover(num);
         }
+        cout<<"generation:"<<generation<<endl;
+        cout<<"Greatest fitness:"<<individuals[0].clacuFitness()<<endl;
+        individuals[0].print();
         return individuals[0];
     }
 
 };
+
 int main()
 {
     int populationSize,geneLength,targetFitness,selectNum,maxGeneration;
@@ -194,7 +204,7 @@ int main()
     geneLength=150;
     targetFitness=150;
     selectNum=20;   //偶数
-    maxGeneration=1000;
+    maxGeneration=10000;
 
     Population population(populationSize,geneLength);
     Individual targetIndiv=population.evolution(targetFitness,selectNum,maxGeneration);
